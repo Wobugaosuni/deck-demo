@@ -1,14 +1,9 @@
 import React from 'react';
 import './index.styl';
 
-// 性能优化
-import PureReanderMixin from 'react-addons-pure-render-mixin';
-
 export default class Input extends React.Component {
   constructor(props) {
     super(props);
-
-    this.shouldComponentUpdate = PureReanderMixin.shouldComponentUpdate.bind(this);
 
     this.state = {};
   }
