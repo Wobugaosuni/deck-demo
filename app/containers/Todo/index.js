@@ -1,46 +1,33 @@
-import React from 'react';
-import './index.styl';
+/// app.js
+import React from 'react'
+import ReactMapGL from 'react-map-gl'
 
-import Input from '../../components/Input';
-import List from '../../components/List';
+import './index.styl'
 
-class Todo extends React.Component {
-  constructor(props) {
-    super(props);
+// Set your mapbox access token here
+const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYW5uaHVhbmciLCJhIjoiY2p4bXZqbTc2MDgyaDNobzZ6cWR0NWtpdCJ9.Kbvafyb464cRf5FKZRlLeg'
 
-    this.state = {
-      todoList: []
-    };
-  }
+// Initial viewport settings
+const initialViewState = {
+  width: 1400, // 图的宽度
+  height: 900,
+  longitude: 114.06667, // 经度
+  latitude: 22.61667, // 纬度
+  zoom: 13, // 地图缩放系数，数值越大，缩放越大
+  pitch: 0,
+  bearing: 0
+}
 
+class App extends React.Component {
   render() {
     return (
-      <div role="containers:Todo">
-        <h2>To Do List Demo</h2>
-        <Input onInputSubmit={this.onInputSubmit.bind(this)} />
-        <List todoList={this.state.todoList} deleteItem={this.deleteItem.bind(this)} />
-      </div>
-    );
-  }
-
-  onInputSubmit(inputValue) {
-    let id = this.state.todoList.length;
-
-    this.setState({
-      todoList: this.state.todoList.concat({
-        id: id,
-        value: inputValue
-      })
-    });
-  }
-
-  deleteItem(id) {
-    this.setState({
-      todoList: this.state.todoList.filter((element, index) => {
-        return id !== index;
-      })
-    });
+      <ReactMapGL
+        mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN}
+        {...initialViewState}
+        onViewportChange={(viewport) => this.setState({viewport})}
+      />
+    )
   }
 }
 
-export default Todo;
+export default App

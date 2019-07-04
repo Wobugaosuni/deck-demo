@@ -1,67 +1,98 @@
-import React, {Component} from 'react';
-import {render} from 'react-dom';
-import {StaticMap} from 'react-map-gl';
-import DeckGL, {GeoJsonLayer, ArcLayer} from 'deck.gl';
+/**
+ * LineLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/line-layer
+ * tooltip: http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
+ */
 
-// Set your mapbox token here
-const MAPBOX_TOKEN = 'pk.eyJ1IjoiYW5uaHVhbmciLCJhIjoiY2p4bXZqbTc2MDgyaDNobzZ6cWR0NWtpdCJ9.Kbvafyb464cRf5FKZRlLeg'; // eslint-disable-line
+import React from 'react'
+import {LineLayer} from '@deck.gl/layers'
+import {StaticMap} from 'react-map-gl'
+import data from './sample'
 
-// source: Natural Earth http://www.naturalearthdata.com/ via geojson.xyz
-const AIR_PORTS =
-  'https://d2ad6b4ur7yvpq.cloudfront.net/naturalearth-3.3.0/ne_10m_airports.geojson';
+import DeckGL, {
+  COORDINATE_SYSTEM,
+  PolygonLayer,
+  PointCloudLayer,
+  MapView,
+  FirstPersonView,
+  // ThirdPersonView,
+  TripsLayer
+} from 'deck.gl'
 
-const INITIAL_VIEW_STATE = {
-  latitude: 51.47,
-  longitude: 0.45,
-  zoom: 4,
-  bearing: 0,
-  pitch: 30
-};
+import './index.styl'
 
-class Home extends Component {
-  _onClick(info) {
-    if (info.object) {
-      // eslint-disable-next-line
-      alert(`${info.object.properties.name} (${info.object.properties.abbrev})`);
-    }
+// Set your mapbox access token here
+const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYW5uaHVhbmciLCJhIjoiY2p4bXZqbTc2MDgyaDNobzZ6cWR0NWtpdCJ9.Kbvafyb464cRf5FKZRlLeg'
+
+// Initial viewport settings
+// const initialViewState = {
+//   longitude: 114.06667, // 经度
+//   latitude: 22.61667, // 纬度
+//   zoom: 13, // 地图缩放系数，数值越大，缩放越大
+//   pitch: 0,
+//   bearing: 0
+// }
+
+const initialViewState = {
+  longitude: -122.41669,
+  latitude: 37.7853,
+  zoom: 9,
+  pitch: 0,
+  bearing: 0
+}
+
+class App extends React.Component {
+  _renderTooltip() {
+    const {hoveredObject, pointerX, pointerY} = this.state || {}
+    return hoveredObject && (
+      <div style={{position: 'absolute', zIndex: 1, pointerEvents: 'none', left: pointerX, top: pointerY, backgroundColor: 'rgba(0,0,255,.1)'}}>
+        { 
+          hoveredObject.message
+        }
+      </div>
+    )
   }
 
   render() {
     const layers = [
-      new GeoJsonLayer({
-        id: 'airports',
-        data: AIR_PORTS,
-        // Styles
-        filled: true,
-        pointRadiusMinPixels: 2,
-        opacity: 1,
-        pointRadiusScale: 2000,
-        getRadius: f => 11 - f.properties.scalerank,
-        getFillColor: [200, 0, 80, 180],
-        // Interactive props
-        pickable: true,
-        autoHighlight: true,
-        onClick: this._onClick
-      }),
-      new ArcLayer({
-        id: 'arcs',
-        data: AIR_PORTS,
-        dataTransform: d => d.features.filter(f => f.properties.scalerank < 4),
-        // Styles
-        getSourcePosition: f => [-0.4531566, 51.4709959], // London
-        getTargetPosition: f => f.geometry.coordinates,
-        getSourceColor: [0, 128, 200],
-        getTargetColor: [200, 0, 80],
-        getWidth: 1
+      new LineLayer({
+        id: 'line-layer', 
+        data, // 一个对象一条线，Data to be used by the LineLayer
+        pickable: true, // 是否响应鼠标事件，Whether the layer responds to mouse pointer picking events
+        getWidth: 10, // The line width of each object
+        getSourcePosition: d => d.from.coordinates,
+        getTargetPosition: d => d.to.coordinates,
+        getColor: d => [Math.sqrt(d.inbound + d.outbound), 140, 0, 170], // The rgba color of each object, in r, g, b, [a]. Each component is in the 0-255 range.
+        onHover: ({object, x, y}) => {
+          const tooltip = object ? `${object.from.name} to ${object.to.name}` : ''
+
+          this.setState({
+            hoveredObject: {
+              message: tooltip,
+            },
+            pointerX: x,
+            pointerY: y
+          })
+        }
       })
-    ];
+    ]
 
     return (
-      <DeckGL initialViewState={INITIAL_VIEW_STATE} controller={true} layers={layers}>
-        <StaticMap mapboxApiAccessToken={MAPBOX_TOKEN} mapStyle="mapbox://styles/mapbox/light-v9" />
-      </DeckGL>
-    );
+      <React.Fragment>
+        <DeckGL
+          initialViewState={initialViewState}
+          controller={true}
+          layers={layers} // 图层，一条竖线
+        >
+          <MapView id="map" width="1200px" height="800px" controller={true}>
+            <StaticMap mapboxApiAccessToken={MAPBOX_ACCESS_TOKEN} />
+          </MapView>
+        </DeckGL>
+        {
+          this._renderTooltip()
+        }
+      </React.Fragment>
+    )
   }
 }
 
-export default Home
+export default App
