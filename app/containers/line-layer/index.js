@@ -1,6 +1,5 @@
 /**
- * LineLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/line-layer
- * IconLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/icon-layer
+ * LineLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/line-layer，一个对象一条线
  * tooltip: http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
  * view state transition: https://deck.gl/#/documentation/deckgl-api-reference/views/view-state-transitions
  */

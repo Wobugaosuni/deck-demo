@@ -49,6 +49,7 @@
     "webpack-dev-server": "^2.4.5"
   },
   "dependencies": {
+    "d3-color": "^1.2.8",
     "deck.gl": "^7.1.7",
     "es6-promise": "^4.1.0",
     "mobx": "^5.0.3",

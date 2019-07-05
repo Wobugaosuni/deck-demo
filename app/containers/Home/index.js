@@ -13,6 +13,7 @@ class Home extends React.Component {
       <div role="containers:Home" style={{display: 'flex', flexDirection: 'column'}}>
         <Link to="/icon-layer">icon-layer</Link>
         <Link to="/line-layer">line-layer</Link>
+        <Link to="/path-style">path-style</Link>
         <Link to="/map-style">map-style</Link>
       </div>
     )
