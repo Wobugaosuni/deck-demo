@@ -2,7 +2,8 @@
 
 const colors = {
   background: '#07156b',
-  road: 'rgba(4,59, 161, 0.5)', // contain: bridge|road|tunnel
+  road: 'rgba(4,59,161, 0.5)', // contain: bridge|road|tunnel
+  label: 'pink'
 }
 
 const style = {
@@ -776,9 +777,9 @@ const style = {
       "source": "mapbox",
       "id": "place_label_other",
       "paint": {
-        "text-color": "#666",
-        "text-halo-color": "rgba(255,255,255,0.75)",
-        "text-halo-width": 1,
+        "text-color": colors.label,
+        "text-halo-color": colors.label,
+        "text-halo-width": 0,
         "text-halo-blur": 1
       },
       "source-layer": "place_label"
@@ -823,9 +824,9 @@ const style = {
       "source": "mapbox",
       "id": "place_label_city",
       "paint": {
-        "text-color": "#666",
-        "text-halo-color": "rgba(255,255,255,0.75)",
-        "text-halo-width": 1,
+        "text-color": colors.label,
+        "text-halo-color": colors.label,
+        "text-halo-width": 0,
         "text-halo-blur": 1
       },
       "source-layer": "place_label"
