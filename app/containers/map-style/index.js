@@ -31,7 +31,7 @@ class App extends React.Component {
         height={900}
         {...this.state.viewport}
         onViewportChange={(viewport) => {
-          // console.log('viewport:', viewport)
+          console.log('viewport:', viewport)
           this.setState({viewport})
         }}
         mapStyle={mapStyle}
