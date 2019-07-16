@@ -50,6 +50,7 @@
   },
   "dependencies": {
     "d3-color": "^1.2.8",
+    "d3-request": "^1.0.6",
     "deck.gl": "^7.1.7",
     "es6-promise": "^4.1.0",
     "mobx": "^5.0.3",

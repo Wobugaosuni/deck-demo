@@ -65,7 +65,7 @@ class App extends React.Component {
         //   })
         // }
         onClick: (info, event) => {
-          // console.log('info:', info)
+          console.log('被点击了，info:', info)
           // console.log('event:', event)
           this.setState({
             viewState: {

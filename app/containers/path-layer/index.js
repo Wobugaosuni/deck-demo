@@ -1,10 +1,10 @@
 /**
- * PathLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/line-layer，一个对象一条线
- * tooltip: http://deck.gl/#/documentation/developer-guide/adding-interactivity?section=example-display-a-tooltip-for-hovered-object
+ * PathLayer: https://deck.gl/#/documentation/deckgl-api-reference/layers/path-layer
  * view state transition: https://deck.gl/#/documentation/deckgl-api-reference/views/view-state-transitions
  */
 
 import React from 'react'
+import {FlyToInterpolator} from 'deck.gl'
 import {PathLayer} from '@deck.gl/layers'
 import {StaticMap} from 'react-map-gl'
 
@@ -44,6 +44,19 @@ class App extends React.Component {
         getPath: d => d.path,
         getColor: d => colorToRGBArray(d.color),
         getWidth: d => 5,
+        onClick: (info, event) => {
+          console.log('被点击了，info:', info)
+          // console.log('event:', event)
+          this.setState({
+            viewState: {
+              ...viewState,
+              longitude: info.lngLat[0],
+              latitude: info.lngLat[1],
+              transitionDuration: 600,
+              transitionInterpolator: new FlyToInterpolator()
+            }
+          })
+        }
       })
     ]
 
