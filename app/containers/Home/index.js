@@ -15,6 +15,7 @@ class Home extends React.Component {
         <Link to="/line-layer">line-layer</Link>
         <Link to="/path-layer">path-layer</Link>
         <Link to="/map-style">map-style</Link>
+        <Link to="/heatmap-earthquakes">heatmap-earthquakes</Link>
         <Link to="/heatmap">heatmap</Link>
       </div>
     )

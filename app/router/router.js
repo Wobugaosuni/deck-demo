@@ -12,6 +12,7 @@ import LineLayer from '../containers/line-layer'
 import PathLayer from '../containers/path-layer'
 import MapStyle from '../containers/map-style'
 import Heatmap from '../containers/heatmap'
+import HeatmapEarthquakes from '../containers/heatmap-earthquakes'
 
 export default class Routes extends React.Component {
   render() {
@@ -24,6 +25,7 @@ export default class Routes extends React.Component {
           <Route path="/path-layer" component={PathLayer} />
           <Route path="/map-style" component={MapStyle} />
           <Route path="/heatmap" component={Heatmap} />
+          <Route path="/heatmap-earthquakes" component={HeatmapEarthquakes} />
         </Switch>
       </Router>
     )

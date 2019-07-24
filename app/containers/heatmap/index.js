@@ -1,104 +1,129 @@
 /**
- * https://uber.github.io/react-map-gl/#/Examples/dynamic-styling
+ * https://uber.github.io/react-map-gl/#/Examples/heatmap
+ * https://docs.mapbox.com/help/tutorials/make-a-heatmap-with-mapbox-gl-js/
+ * demo: https://docs.mapbox.com/help/demos/heatmap/index.html
  */
 
 import React from 'react'
 import ReactMapGL from 'react-map-gl'
-import {json as requestJson} from 'd3-request'
+import { observable, toJS } from 'mobx'
+import {observer} from 'mobx-react'
 
+import getMapBoxStyle from './map-style'
 import './index.styl'
+import data from './sample'
 
 // Set your mapbox access token here
 const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYW5uaHVhbmciLCJhIjoiY2p4bXZqbTc2MDgyaDNobzZ6cWR0NWtpdCJ9.Kbvafyb464cRf5FKZRlLeg'
-const HEATMAP_SOURCE_ID = 'earthquakes-source'
 
+@observer
 class App extends React.Component {
   state = {
     viewport: {
-      longitude: 114.06667, // 经度
-      latitude: 22.61667, // 纬度
-      zoom: 3, // 地图缩放系数，数值越大，缩放越大
+      longitude: -79.999732, // 经度
+      latitude: 40.4374, // 纬度
+      zoom: 11, // 地图缩放系数，数值越大，缩放越大
       pitch: 0,
       bearing: 0
     }
   }
-  _mapRef = React.createRef()
 
-  _mkHeatmapLayer = (id, source) => {
-    const MAX_ZOOM_LEVEL = 9
-    return {
-      id,
-      source,
-      maxzoom: MAX_ZOOM_LEVEL,
-      type: 'heatmap',
-      layout: {
-        "visibility": "none" // 是否显示图层
-      },
-      paint: {
-        // Increase the heatmap weight based on frequency and property magnitude
-        'heatmap-weight': ['interpolate', ['linear'], ['get', 'mag'], 0, 0, 6, 1],
-        // Increase the heatmap color weight weight by zoom level
-        // heatmap-intensity is a multiplier on top of heatmap-weight
-        'heatmap-intensity': ['interpolate', ['linear'], ['zoom'], 0, 1, MAX_ZOOM_LEVEL, 3],
-        // Color ramp for heatmap.  Domain is 0 (low) to 1 (high).
-        // Begin color ramp at 0-stop with a 0-transparancy color
-        // to create a blur-like effect.
-        'heatmap-color': [
-          'interpolate',
-          ['linear'],
-          ['heatmap-density'],
-          0,
-          'rgba(33,102,172,0)',
-          0.2,
-          'rgb(103,169,207)',
-          0.4,
-          'rgb(209,229,240)',
-          0.6,
-          'rgb(253,219,199)',
-          0.8,
-          'rgb(239,138,98)',
-          0.9,
-          'rgb(255,201,101)'
-        ],
-        // Adjust the heatmap radius by zoom level
-        'heatmap-radius': ['interpolate', ['linear'], ['zoom'], 0, 2, MAX_ZOOM_LEVEL, 20],
-        // Transition from heatmap to circle layer by zoom level
-        'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 9, 0]
-      }
+  @observable sources = {
+    'trees': {
+      type: 'geojson',
+      data,
     }
   }
 
-  _getMap = () => {
-    // console.log('this._mapRef:', this._mapRef.current.getMap())
-    return this._mapRef.current ? this._mapRef.current.getMap() : null
-  }
-
-  _handleMapLoaded = event => {
-    const map = this._getMap()
-
-    requestJson(
-      'https://docs.mapbox.com/mapbox-gl-js/assets/earthquakes.geojson',
-      (error, response) => {
-        if (!error) {
-          console.log('request success:', response)
-          // Note: In a real application you would do a validation of JSON data before doing anything with it,
-          // but for demonstration purposes we ingore this part here and just trying to select needed data...
-          // const features = response.features
-          // const endTime = features[0].properties.time
-          // const startTime = features[features.length - 1].properties.time
-
-          // this.setState({
-          //   earthquakes: response
-            // endTime,
-            // startTime,
-            // selectedTime: endTime
-          // })
-          map.addSource(HEATMAP_SOURCE_ID, {type: 'geojson', data: response})
-          map.addLayer(this._mkHeatmapLayer('heatmap-layer', HEATMAP_SOURCE_ID))
-        }
+  @observable layers = [{
+    id: 'trees-heat',
+    type: 'heatmap',
+    source: 'trees',
+    maxzoom: 15,
+    paint: {
+      // increase weight as diameter breast height increases
+      'heatmap-weight': {
+        property: 'dbh',
+        type: 'exponential',
+        stops: [
+          [1, 0],
+          [62, 1]
+        ]
+      },
+      // increase intensity as zoom level increases
+      'heatmap-intensity': {
+        stops: [
+          [11, 1],
+          [15, 3]
+        ]
+      },
+      // assign color values be applied to points depending on their density
+      'heatmap-color': [
+        'interpolate',
+        ['linear'],
+        ['heatmap-density'],
+        0, 'rgba(236,222,239,0)',
+        0.2, 'rgb(208,209,230)',
+        0.4, 'rgb(166,189,219)',
+        0.6, 'rgb(103,169,207)',
+        0.8, 'rgb(28,144,153)'
+      ],
+      // increase radius as zoom increases
+      'heatmap-radius': {
+        stops: [
+          [11, 15],
+          [15, 20]
+        ]
+      },
+      // decrease opacity to transition into the circle layer
+      'heatmap-opacity': {
+        default: 1,
+        stops: [
+          [14, 1],
+          [15, 0]
+        ]
+      },
+    }
+  }, {
+    id: 'trees-point',
+    type: 'circle',
+    source: 'trees',
+    minzoom: 14,
+    paint: {
+      // increase the radius of the circle as the zoom level and dbh value increases
+      'circle-radius': {
+        property: 'dbh',
+        type: 'exponential',
+        stops: [
+          [{ zoom: 15, value: 1 }, 5],
+          [{ zoom: 15, value: 62 }, 10],
+          [{ zoom: 22, value: 1 }, 20],
+          [{ zoom: 22, value: 62 }, 50],
+        ]
+      },
+      'circle-color': {
+        property: 'dbh',
+        type: 'exponential',
+        stops: [
+          [0, 'rgba(236,222,239,0)'],
+          [10, 'rgb(236,222,239)'],
+          [20, 'rgb(208,209,230)'],
+          [30, 'rgb(166,189,219)'],
+          [40, 'rgb(103,169,207)'],
+          [50, 'rgb(28,144,153)'],
+          [60, 'rgb(1,108,89)']
+        ]
+      },
+      'circle-stroke-color': 'white',
+      'circle-stroke-width': 1,
+      'circle-opacity': {
+        stops: [
+          [14, 0],
+          [15, 1]
+        ]
       }
-    )
-  }
+    }
+  }]
 
   render() {
     return (
@@ -107,13 +132,11 @@ class App extends React.Component {
         width={1400} // 图的宽度
         height={900}
         {...this.state.viewport}
-        mapStyle="mapbox://styles/mapbox/dark-v9"
+        mapStyle={getMapBoxStyle(toJS(this.sources), toJS(this.layers))}
         onViewportChange={(viewport) => {
           // console.log('viewport:', viewport)
           this.setState({viewport})
         }}
-        ref={this._mapRef}
-        onLoad={e => this._handleMapLoaded(e)}
       />
     )
   }

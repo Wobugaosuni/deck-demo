@@ -1,5 +1,16 @@
 const data = [
   {
+    name: "test",
+    code: "LF",
+    address: "3601 Deer Hill Road, Lafayette CA 94549",
+    entries: "3481",
+    exits: "3616",
+    coordinates: [
+      114.067925,
+      22.573183333333333
+    ]
+  },
+  {
     name: "Lafayette (LAFY)",
     code: "LF",
     address: "3601 Deer Hill Road, Lafayette CA 94549",

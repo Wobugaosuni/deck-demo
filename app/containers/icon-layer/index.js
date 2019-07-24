@@ -45,8 +45,10 @@ const ICON_MAPPING = {
 }
 
 const initialViewState = {
-  longitude: -122.41669,
-  latitude: 37.7853,
+  // longitude: -122.41669,
+  // latitude: 37.7853,
+  longitude: 114.06667, // 经度
+  latitude: 22.61667, // 纬度
   zoom: 10,
   pitch: 0,
   bearing: 0
