@@ -18,11 +18,13 @@ const MAPBOX_ACCESS_TOKEN = 'pk.eyJ1IjoiYW5uaHVhbmciLCJhIjoiY2p4bXZqbTc2MDgyaDNo
 
 @observer
 class App extends React.Component {
+  _mapRef = React.createRef()
+
   state = {
     viewport: {
       longitude: -79.999732, // 经度
       latitude: 40.4374, // 纬度
-      zoom: 11, // 地图缩放系数，数值越大，缩放越大
+      zoom: 18, // 地图缩放系数，数值越大，缩放越大
       pitch: 0,
       bearing: 0
     }
@@ -125,6 +127,16 @@ class App extends React.Component {
     }
   }]
 
+  _getMap = () => {
+    // console.log('this._mapRef:', this._mapRef.current.getMap())
+    return this._mapRef.current ? this._mapRef.current.getMap() : null
+  }
+
+  _handleMapLoaded(e) {
+    const map = this._getMap()
+    // console.log('map:', map)
+  }
+
   render() {
     return (
       <ReactMapGL
@@ -137,6 +149,12 @@ class App extends React.Component {
           // console.log('viewport:', viewport)
           this.setState({viewport})
         }}
+        ref={this._mapRef}
+        onLoad={e => this._handleMapLoaded(e)}
+        onClick={e => {
+          if (!e.features) return
+          console.log('圈圈被点击了：', '<b>DBH:</b> ' + e.features[0].properties.dbh)
+        }} // 地图被点击
       />
     )
   }
