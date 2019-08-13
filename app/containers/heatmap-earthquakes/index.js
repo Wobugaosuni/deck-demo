@@ -66,9 +66,6 @@ class App extends React.Component {
         // Transition from heatmap to circle layer by zoom level
         'heatmap-opacity': ['interpolate', ['linear'], ['zoom'], 7, 1, 9, 0]
       },
-      onClick: (info, event) => {
-        console.log('被点击了，info:', info)
-      }
     }
   }
 

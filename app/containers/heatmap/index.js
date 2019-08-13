@@ -2,6 +2,7 @@
  * https://uber.github.io/react-map-gl/#/Examples/heatmap
  * https://docs.mapbox.com/help/tutorials/make-a-heatmap-with-mapbox-gl-js/
  * demo: https://docs.mapbox.com/help/demos/heatmap/index.html
+ * Add a new layer below labels: https://docs.mapbox.com/mapbox-gl-js/example/geojson-layer-in-stack/
  */
 
 import React from 'react'
@@ -134,7 +135,20 @@ class App extends React.Component {
 
   _handleMapLoaded(e) {
     const map = this._getMap()
-    // console.log('map:', map)
+
+    map.addSource('trees', {
+      type: 'geojson',
+      data: data
+    })
+
+    map.addLayer(this.layers[0], 'waterway-label')  // 第二个参数是放到某一个图层的下面
+    map.addLayer(this.layers[1], 'waterway-label')
+
+    // not work????
+    // map.on('click', 'trees-point', function(e) {
+    //   console.log('click click click')
+    //   debugger
+    // })
   }
 
   render() {
@@ -144,7 +158,7 @@ class App extends React.Component {
         width={1400} // 图的宽度
         height={900}
         {...this.state.viewport}
-        mapStyle={getMapBoxStyle(toJS(this.sources), toJS(this.layers))}
+        // mapStyle={getMapBoxStyle(toJS(this.sources), toJS(this.layers))}
         onViewportChange={(viewport) => {
           // console.log('viewport:', viewport)
           this.setState({viewport})
